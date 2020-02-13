@@ -22,10 +22,11 @@ ui <- navbarPage(theme = shinytheme("united"),
                                                                  choices = list("Sepal Length" = "Sepal.Length",
                                                                                 "Sepal Width" = "Sepal.Width",
                                                                                 "Petal Length" = "Petal.Length",
-                                                                                "Petal Width" = "Petal.Width")
+                                                                                "Petal Width" = "Petal.Width"),
+                                                                 selected = "Sepal.Width"
                                                      ),
                                                      
-                                                     h3("---------------------------------------"),
+                                                     h3("-------------------------------", align="center"),
                                                      
                                                      h3("Filtrer les données"),
                                                      
@@ -40,7 +41,7 @@ ui <- navbarPage(theme = shinytheme("united"),
                                                      uiOutput("slideFiltre"),
                                                      
                                                      actionButton("action",
-                                                                  label = "Action"
+                                                                  label = "Actualiser"
                                                      )
                                         ),
                             
@@ -73,7 +74,8 @@ ui <- navbarPage(theme = shinytheme("united"),
                                                                                 "Petal Width" = "Petal.Width"))),
                                         
                                         mainPanel(h3("Statistiquess"),
-                                                  textOutput("stat"))
+                                                  textOutput("moyenne"),
+                                                  textOutput("std"))
                           )
                           
                           
@@ -126,7 +128,16 @@ server <- function(input, output) {
   })
   
   output$plot <- renderPlot({
-    action()
+    if (input$action == 0){
+      plot(x = iris$Sepal.Length,
+           y = iris$Sepal.Width,
+           main = paste("Sepal Length", " / ", "Sepal Width"),
+           xlab = "Sepal Length",
+           ylab = "Sepal Width",
+           col = iris$Species)
+    }else{
+      action()
+    }
   })
   
   
@@ -142,9 +153,14 @@ server <- function(input, output) {
   
   
   # Page "Statistiques ####
-  output$stat <- renderText({
+  output$moyenne <- renderText({
     moyenne <- mean(iris[[input$selectVar]])
-    paste("La moyenne de ", input$selectVar, " est de : ", moyenne)
+    paste("La moyenne de ", input$selectVar, " est de : ", round(moyenne, 2), " cm")
+  })
+  
+  output$std <- renderText({
+    std <- sd(iris[[input$selectVar]])
+    paste("L'écart type de ", input$selectVar, " est de : ", round(std, 2))
   })
   
   
